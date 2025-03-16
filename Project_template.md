@@ -1,63 +1,49 @@
 # Project_template
 
-Тип: Материал
-Родитель: Описание проекта для 11 когорты (https://www.notion.so/11-03abbbbc8bcb49ed9b85c9b6d1174056?pvs=21)
-
-Это шаблон для решения проектной работы. Структура этого файла повторяет структуру заданий. Заполняйте его по мере работы над решением.
-
 # Задание 1. Анализ и планирование
-
-<aside>
-💡
-
-Чтобы составить документ с описанием текущей архитектуры приложения, можно часть информации взять из описания компани и условия задания. Это нормально.
-
-</aside>
 
 ### 1. Описание функциональности монолитного приложения
 
 **Управление отоплением:**
 
-- Пользователи могут…
-- Система поддерживает…
-- …
+- Пользователи могут удалённо включать/выключать отопление в своих домах и устанавливать определенную температуру.
+- Система поддерживает возможность термостатирования.
 
 **Мониторинг температуры:**
 
-- Пользователи могут…
-- Система поддерживает…
-- …
+- Пользователи могут просматривать текущую температуру в своих домах через веб-интерфейс.
+- Система получает данные о температуре с датчиков, установленных в домах.
 
 ### 2. Анализ архитектуры монолитного приложения
 
-Перечислите здесь основные особенности текущего приложения: какой язык программирования используется, какая база данных, как организовано взаимодействие между компонентами и так далее.
+- Язык программирования: Java
+- База данных: PostgreSQL
+- Архитектура: Монолитная, все компоненты системы (обработка запросов, бизнес-логика, работа с данными) находятся в рамках одного приложения.
+- Взаимодействие: Синхронное, запросы обрабатываются последовательно.
+- Масштабируемость: Ограничена, так как монолит сложно масштабировать по частям.
+- Развёртывание: Требует остановки всего приложения.
 
 ### 3. Определение доменов и границы контекстов
 
-Опишите здесь домены, которые вы выделили.
+Домен "Умное отопление":
+1. Контекст "Управление отоплением":
+  - Отвечает за включение/выключение отопления
+  - Управляет целевой температурой
+2. Контекст "Мониторинг температуры":
+  - Отвечает за получение данных с датчиков температуры.
+  - Хранит историю изменений температуры.
 
 ### **4. Проблемы монолитного решения**
 
-- …
-- …
-- …
-
-Если вы считаете, что текущее решение не вызывает проблем, аргументируйте свою позицию.
+- Смешение ответственности: контроллер HeatingSystemController отвечает и за управление отоплением, и за мониторинг температуры
+- Высокая связка сущностей: HeatingSystem и TemperatureSensor работают как единое целое, предполагается, что у HeatingSystem есть только один TemperatureSensor, и его currentTemperature передается в едином HeatingSystemDto
+- Синхронное взаимодействие: это увеличивает зависимость между компонентами и ограничивает масштабируемость из-за блокирующих вызовов. При этом специфика приложения предполагает возможность использования асинхронных вызовов
+- Сложность расширения: интеграция новых устройств в текущей архитектуре затруднительна
 
 ### 5. Визуализация контекста системы — диаграмма С4
 
-Добавьте сюда диаграмму контекста в модели C4.
-
-Чтобы добавить ссылку в файл Readme.md, нужно использовать синтаксис Markdown. Это делают так:
-
 ```markdown
-[Текст ссылки](URL)
-```
-
-Замените `Текст ссылки` текстом, который хотите использовать для ссылки. Вместо `URL` вставьте адрес, на который должна вести ссылка. Например:
-
-```markdown
-[Посетите Яндекс](https://ya.ru/)
+[Диаграмма контекста "Теплого дома"](https://www.plantuml.com/plantuml/uml/PO_1JlD038Jl-nJ-S-el8N7f4Q6Y0keHKH37oYGcMIbhHrwlA6_FcbGKDISxuyctCvjig5RI62pQIF26cdPICi5MsEXeS1-nLqmXc4nW0kzY9WcwgDHQ50xXN-HsB1t1pNPzlLqV_4-CJ7eRmXDf5bvLe5v1yrf7K-STk03o0JRyVNCWjCWzvAzib9h_OV-phDmnk6F-heHV1MR9gVC62HbxfyptAasaQ4Mf0a_4myFHLY_dovuuYoTSQ0xUeNQVg0Ijf4cOs9pqJEEfroAU5ytUxTp4tPU-PO3caQmTA4DRL8dj8ls6k2jf_0O0)
 ```
 
 # Задание 2. Проектирование микросервисной архитектуры
@@ -66,32 +52,50 @@
 
 **Диаграмма контейнеров (Containers)**
 
-Добавьте диаграмму.
+```markdown
+[Диаграмма контейнеров](https://www.plantuml.com/plantuml/uml/ZLJ1Rjim3BtxAxGSXWn8iKkFmz0s7TPYBP0rsxbGRIuMAakTIBNBXltxP9iDdMWGSh8fyl59JtmwGzA1OcShCcH1hRiKgYlVfTyj4dJgH2sz8sqS17Lfz2RehghU65VRs83wi3nzlpoztvLyhAeL1FHk_XqXBDIi_ypIzzeH15qJgXT3hQ8M50vSRS-50zViNLMDhFSNFhf6X-rys52_dp6HEasto33rfr9AoKRdvwlh-y-Qu4Ll4o95YgDPt-0f6BTHI-jZCrs_yv40LO2V4P1GaLS8uTdKW6bd1mpzkTPZba-fE9nGN7XFVNYhdTu0gfZASA5qf1OScLgJyIx5hb4O7x0EvgbVING7R5UWAJKKGbuuWhFbob7YWIjzdo1eYW5KdJY2jndZZTcq-vIySWodxKjnF5Uwxhg5_4Xhg6Cmj1M2rvLZ27pzc8IiTGT1uwYWjZfqESzv9DyDGWkJh1Muhb9JcxYq56CDJWVZSvPRxmpvi2UOh1LObjvQg5aixRJT_awS11OweB1LZIRDR0UKbodpeB5dMdcaJO3rrvk18P42yeMVl9W6kClXdW4ngNaH_EDWrI_wnwEUdXoUmT594qpwgjftNNGyiwdNtvrNF_sY-RN_TWc3LH8-1OgZsSwmr4BeF98cNF20B5xl4S6X3toFVAczvUx0yZkoR-Wrk4QCcYhxmhsIgJtPsMm_zVR0VyK-cV6u5RkgYCqjn63BYI8wzmUZaHD5j4nuXfTvBdQGwSqwTBkKTE3REjHhRowMurkpKuzfHQSIY6U6CQ9E2IDQDMEEqRawKxmyCo8L0tDHfa1ninXuEiOxZ5YNpJgC9hjqgcC1mHeAY8KieMJq12PQ5c2Yey14n09mEcpH0cOw5h3P8_XVPGvViLLyi0RRr-SBSssEn-NY78tBrIaWHILfaijKRY9oIO_g35mJErlz0m00)
+```
 
 **Диаграмма компонентов (Components)**
 
 Добавьте диаграмму для каждого из выделенных микросервисов.
 
+```markdown
+[Диаграмма компонентов для User Service](https://www.plantuml.com/plantuml/uml/TP9DRzfC4CVl-odcuV0eaOguv5HLKGAaQjL4IeFQ7j5WJs2LVQ4xkwYqwdVlZeFnEeQJjN_F_EPb_ZSSCSHaZOew6e9lJ04M57Qw8XZ3pDkjT-GYp3Mk0rgb_jEkCgac-32xciokbiUGQwLctaNKZi9owfEhCUml17ZWlODHYHzTmXy505sH9bWOmHj3eOtlb56MFg6h3J7SFdw6G3yJSUJHPHzKLhttQrszAGsDABHfOks86OmeyEm390cqw71DDhDEifzewrb77_OjkLC4-z2ayokhneYW7Sod0zPjYfjkE_9gMon7nQpdQ5rXrDx1_utWW_xTl0VGHLfn5VHMVdRmKYsBz5hb8aYs-bUfnPuZsUNThtWnnuWhvECXsxTW5j67bg9TtgD5WSYlHyzn7MZnzJuJ2zm3CUVIq-1VccCVtl0gIERTZbmSrq7dBrJUskHqTUH-mUSNx25bdzvYV_1EEpKsTd-v8eT1UnbSgRuNOJo-XhUkWlTvkE0hOYRkpAW6SPBSjusaVgHOROWdd8NIAsS0XLSa-xGvpkGEB26CRWdziolLxrK8nrjBsXDXpPCVGKVAqKLVWyZlQ7IDEGogGBMqYIQd3DiPfBQ6AbixR4UTdh5df-OqQMKqRzhLafZft7K6nZdSTgVhyZIGZLtuHDsGgvCr_m00)
+```
+
+```markdown
+[Диаграмма компонентов для Heating Service](https://www.plantuml.com/plantuml/uml/XLJ1RjfG4BpxAxOSgaGgwYN7gag0g8rQ90BSqM9lpLFizzpTDIcg-k_DlhZ6s5PwGensPzxE3DoA8cjT5eawBGY-4ghpEMo8ZoubcC8yb5Nmv1KM3dF6CadUEPyMTKRmQNxpSNwpQqS-9yayU4NdYNUpKFiC-NJLS3QK7s3I4vbSm-ya0O2prhyTO-DG5CITjJCuUK4t5Hiu2q4dDeG-AqZWy3eyPIfGAOExrGCm_Qn9L2RNFRKjbHKnQisqH8zvbEk04D5HlHM7b4H8G3lp6Ie2-WpIrxUsxp7fiKFNL0Ln6lZKEVGCHgKWcZDj7h_7PsZWyvaW9r4gGHIL92eN8HyUUdyahwjwNpWvn2CZ02rYpD_mnnD6mGOTcacsPUp9doJPHEdT_I-zkglS5rHwHhl276--6Tiwr4hIow6xl2GHp6d6uOcuyuusqgWwpTYzV48QohBsBaLrmLyIBL1nZqB_yyn2kjny2Di5MIN5fajaRNyG3Hvfo4jWWVTWVfoaynQRF3g4vUDsQ_QigRWmPLZhrfZcLLrpR7jaOzZMZadxMfmd4SlVfGt9sCQmU6-NwWsgGQi6pMaQqt3qvtl9cy7P-Ege_4LgypOB4dXsUW3fnMKHDlaOuuWFRO46ZZ2bWRFO_5locVrl_WK0)
+```
+
+```markdown
+[Диаграмма компонентов для Lighting Service](https://www.plantuml.com/plantuml/uml/XLJ1Rjf04BtxAwOSgaGgwYN7gag0g8qQ90BSqU2TcbNMktHdbXHL_VSohhiO3Ee9FDxttknxJxvdmIYfTeLOSGJFjjg8zHKiAEviIJ24SQYtmPCNc5Yi8jP5ySxwqYL3y6byzt5yjyf7FXV5E7X1wockHY5vWt5_yu-qvVm0WtEPmItyAWe0EAfbb1B6u1p5Bl0u7Hp6YstKuIW4qSUlw8qZ1jUU7aPoA6JWOVO4aNuaOk71xHN1ANgiJjNQqGMfTe-Z5XZI6p6WDu19GerYWx-gDgTjO2iXxhk2nwcAp09B5MdnyjniS1XJHv05fTNZSaCcEUfVxd57NcPfxInlchir0yWJ9Vw6trzH_xJJImwImfI--5qKYpqBrQl7dtBpiBLVKEWDzHfgS_kaTFEGXFZC_2vuIinOqIY6LufvaKwGZUhGH7luXJBKTVAsR7tj4arGS8rC__NCeE0fz2ai9t-Jq-CrHe6SHljYaD-iariVpl6RbNAZ23LVBTfpPps5xYp2z6MvLCVcv4vywZSycvKtxJgc-4kONd6pR-l4rXCpk53PigNe7UzNyMhBhb7qwjMlqB4wod0EEA_0WhpfOQ-fdsGtpluJmo6W3N2JMSF5y3wdfd5gD9crxqBkKz-FI6M8XZNNU_96Fw5_0000)
+```
+
+```markdown
+[Диаграмма компонентов для Security Service](https://www.plantuml.com/plantuml/uml/TLJ1Rjim3BtxAxYSLc35BZqEGrkds8ejG9ha7Z0ovmgHfKoaqmN3_dqch3YEfvqYqU9xv7iFkMV1A6tZ2h7Y2DPascZbr1tYqHg2MoX3SmYUlC3SOXsnAOftrXlNLWIVohkFvTrsUFAvAChW1Qsdk7qChQymdjwVGHFc1vXDQMOtyBie0E32DdGfO0pEKHmtNgepBH-YzJKyXY1w_Og-SiJ0wVLj98T25Jmido7IpvPOU7Op8NmmXfWNwB4cvUhla0ePcluB0_OFJJyITEG3Cs0heK6nmIjVTi4L7G9R2V4qNl1ILQfbOAaZhL--wstTbI-yBjHyJSeaqWtwxufFH_AoR7VEyYlfZbeG62eA_Wr_x54FgPhJaRHDuOi_HR4-iL2pVVhLINYmNr3e3NKL5JlT56uLMY6UM31kNX0prlGOmvxYU91aPyzwMqNR_O89JTDwQvAsOw0v2kwGwN-w3JfLA7ZT-XmsSz94yjYBL5A84XkAs7rrmUox7oRF8NO7DG0TneP7esbQZXPXyRBPg5ehSbSQvJAUX1gc7Akb_RcUING7nNOjMvyoOaq2c3pEnt2Y50iAzIdJkEMH9kdA9IWb9_LF6wO9M9ElChqvxYlZoi40OdYpydfsovpTqqMITUgg-fDmStAC0ZKL9f89iM8rzvvyfV-aVm40)
+```
+
+```markdown
+[Диаграмма компонентов для Automation Service](https://www.plantuml.com/plantuml/uml/bLDDRzim3BtxLt0vhS22NNeSXZOVs8gjG1Rl7h0MumYLnKmVNODX_tsYuzLHOmDf3ef9wRr7KaytFg0BiJ55qC4GtCR03GRD5afoJxeYcCAScprRiW4M6ck7JL6yqxOoKH5ycbz_d5zlNevyBeevsu3QajlCE5g5xl2-f-rOFy3aN6fo1NyAI3zPUjKJj50xDePSJj3d9scZt3jjQvWn1mc_ebM6FDokxi3HhqW-UDYo0-m9V4KMdMO_kNebNdOxzsYnRdN_Pw1B3KWUTpn4JswgQAijgSlarj7GqjRQoeWaW6Cq8B9yfYe6ygV4Bagd3-YJNWg3qtLDpWDQ1HLRfULKhffFU4rxzZgmE-GJxlCYlM8VQaVbZ-yIbIazL8Q8xhGNq9dYyYcjg_XWjD-rKsqJy98Htc-uVKJvwBAv1Wb0MlbR5EN11seso-VKobv_mK2_KHgGA-yYuLbp39aH17yAlYVliQQPuqToVGMzXrhHgN8w_KF5JHEjhjfwSg851fHRUDEi3DS-fxdZdmkIf-4JD0NGHIrJWox0ZXi2rMO5Mwp9P2COUJjhFdDEFn3X6CQTFuREwMFc5gepKERnKHTtwDF3sJXAiif3TQoklGkqQbHpnE5o7PTfvuOTDQLqazjJY5w3CvzrlMGy6NguzjvYbvZg9Yd4nlm3)
+```
+
+```markdown
+[Диаграмма компонентов для Monitoring Service](https://www.plantuml.com/plantuml/uml/ZLN1Rjim3BtxAxYSLc35BZqEGvkaw8ejG1Rt7h0samgL9K-aitd3_dsYvyPnB7Gx51KfFZxn-H6vPi4WJMKpCM89LjuPyS6uFUGK3gOWk8I5hshlo0ai3Uu3LbdsnhZ2DYN1XyNL-yNLzbZoCSiMtWaQHs4xzuqhCRHlXxPzrtSmcrBDBk1NbW70m7Y2rBR1MqjX31xoitYHrrroxhre-0bTQOdXPdqFWRurnCAmym64B5KaeOKI1MSNPxGFBzVhu0jYzafwJC8ncw3ixuWXSiS_jEtF632vM9zckt6-YcLB4Ygae-epqATIF7-l61hNS8CMQXIXu1YCIqsN5dL3jMSzjsDHXtmtacVP1yg_Vj4eZsdYVt7SM0goGeTxqe6w4FeuCSqTEGeegffMCZmYKmdU0NPI6E89nUs1dAoRHslugIFf4d3CQD_Fk7j6FRna6QfXJ5A0DlwTPNdBGjNszaTyUstkKEWxgYfgdJxIFXlVoCXGYZy5huWv3ZaF_fd2y8B1YntfPHbC_0-5hwh6cGB5U3Tkj4H1LU7_Fi0OU-yVbgGxnR4-1f1tzcE5BtHPr3drKykHMQqJC7QYeADa6x8Z1L8hE0Wng7cgX_P8uvARrPydQw9jKe3fmlJRCBZb5NJQ_cbP-pOJmh6zf_RT-J1vonWpSMz_FlReKUTrv_xAoPLfKoiwFUjWhLUdJeatSjQ62ZA7oMVBhicL-gFo1m00)
+```
+
 **Диаграмма кода (Code)**
 
-Добавьте одну диаграмму или несколько.
+```markdown
+[Диаграмма кода](https://www.plantuml.com/plantuml/uml/bLNDRlCu3BpxAOYSN3Gji5TZ4RHe3otGRWz97u2LMKTOImeakhlPdtV_PFDJe5XfWkzaoPmPZIYAkWkCdWVJLwov9rYRE8KdP-9m7vWCtC0hQWiFFOP0eQhKE83tG1x-hI26NvpjGBVJUCrUnvb5G_cS3EfUm3hmx_S3EuEidLqhikYrMq6GaGiHTWtAsK_T3PuIe4xn1ahsLGDVBZhuFtUt9l-b5Kqchy5JfmEJ7oFrQAy1yROKSsaQfKR8nC61jsHPAsIQU3ao4dSOmb_EjndtmxcUq0ez1DqTFDP3L13n9VpIPfu8EQhBSPGvJsk23czs-j6wuQCdOFGTyORCZZpou2aFgi5xihFeDSI1VRDryd3uzVbvz2z4tRbwpN7SY3uLcyY0QxB15SLprfeW5VQFoBJHXY2AylkkZLDnDFDobOmKQSpB8kttPwZMRJCPEh7z4d8X6mcuXBDvUT7TbYyTwkMJAKM_s-iKExVJOq2XlIOrUCtxHnBfCyxllI6HHc-EdBSwPBzAySouiANuIzkYLG8AvVAUNUvUqgmsNdST-HMm34BMnzGek0ASljAvw6zI0rEvDz4vqpILiwqUXQG3RadzMMSjvI0agtwlm_iTdRPI9YDFT2AKFVVvkwo-EglP-QBKbEjxKhoXdWontzSjZT6PZXoknNx_3pqYuwp5sFQ-9yzJuqpC9HWA0RlKlajBpsvJbcQPe7mU67a8XrKVd35esrh9zyHA-VDoSoDlOGCH78q5M4rnMFos68EBFnQdYgyvF74JeqJa_5Gw3Mpn8ZhLHm9NYNrx-z-gxCCHj_Z0G2qukwY4Az1PmumuXNQqpTxrHz2iuLp4pkvuYQsoTIN1inSmp_HH949Fxiz8bOxukT78a0xS90CZAhSeg7dRQo2GAiukmvyyShbV4wcuEP6KrMwJhb205XaZ8SNoYjEMoQFYwPZloBQ3wQiV)
+```
 
 # Задание 3. Разработка ER-диаграммы
 
 Добавьте сюда ER-диаграмму. Она должна отражать ключевые сущности системы, их атрибуты и тип связей между ними.
 
-Четвёртое задание — дополнительное. Его можно сделать по желанию. Чтобы ревьюер быстрее проверил ваше решение, укажите, сделали вы это задание или нет. Для этого оставьте нужный эмодзи около заголовка задания:
+```markdown
+[ER-диаграмма](https://www.plantuml.com/plantuml/uml/jLLTRjGm47xFAQo-y2Fb0aX8BGgeg4L2PFk4Lj6G38wbs0xZCMNLSWREm1LuWMCiDy9s0zai4I58z2cQx_Dyt_nCzzGn47lTPQouGr5g81RdLeVFdMFK8XTFNub2WIJGMOOcy7RYoY69cqo8Xq8ruf6uj4QAroyljY6KvobkG6D0IYPbP8gW1jKDeKY_CkgTnst2Ud3ksb9JjU3QyTd7Nuhd21mYTwOMf9Mhh0dG4six19DY32IHAqRT8m5xYkOAwzzqcF3Q4w7v0y4xfEf0yTd5DkYbJjnNpOC3gvinHOd6sQLEjNUbLIxLDgCngJs9_PNZ3XnNlc-0CQRSA8sEGVS7LY-LR7bzDrSqeyJWCtmK-5xLk2m5fB7vPxKpprO3AslA6WsGigktTCMSIKcvU0TkC3AJytUtut2jQLH4vcxXh4x8_z3bNOzpaY-iKMnZi0261UacpNf6-BdT50aRzNukvMH1Kn9Wc74ovbWmCQqaTOI1lLizxNlYSVeJ-y_xBzy_xR_klmsHBDB4xMsUsvlfaOPy9_RQk9C99LrRXC9qcMmtXOzF9V0q690ufSrCRqZvLabFn-onNO6a32D1pO6JJVmEx9b_NU5L2u4_epgy6SvWcJdiRIJYXr0hHw-Zlu4qtRH8bcYG8B6pKpHD_BNw0G00)
+```
 
-✅ — вы выполнили задание.
-
-❌ — вы пропустили задание.
-
-# ✅ ❌ Задание 4. Создание и документирование API
-
-### 1. Тип API
-
-Укажите, какой тип API вы будете использовать для взаимодействия микросервисов. Объясните своё решение.
-
-### 2. Документация API
-
-Здесь приложите ссылки на документацию API для микросервисов, которые вы спроектировали в первой части проектной работы. Для документирования используйте Swagger/OpenAPI или AsyncAPI.
+# ❌ Задание 4. Создание и документирование API
