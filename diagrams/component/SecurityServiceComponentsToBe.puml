@@ -1,0 +1,27 @@
+@startuml
+title Security Service - Component Diagram
+
+!include <C4/C4_Component>
+
+Container_Boundary(SecurityService, "Security Service") {
+
+    Component(SecurityController, "Security Controller", "Spring Boot", "Handles security-related API requests")
+    Component(AccessManager, "Access Manager", "Spring Boot", "Manages access control and security automation")
+    Component(SecurityRepository, "Security Repository", "PostgreSQL", "Stores access logs and security settings")
+    Component(EventPublisher, "Event Publisher", "Kafka", "Publishes security-related events")
+
+}
+
+System_Ext(ApiGateway, "API Gateway", "Routes API requests")
+System_Ext(MessageBroker, "Kafka", "Handles event-driven communication")
+System_Ext(Database, "PostgreSQL", "Stores security data")
+System_Ext(IoTDevices, "Security Devices", "Cameras, locks, sensors, and alarms communicating via MQTT")
+
+Rel(ApiGateway, SecurityController, "Routes security requests")
+Rel(SecurityController, AccessManager, "Handles business logic")
+Rel(AccessManager, SecurityRepository, "Stores security states and logs")
+Rel(AccessManager, EventPublisher, "Publishes security events")
+Rel(EventPublisher, MessageBroker, "Sends security events")
+Rel(AccessManager, IoTDevices, "Communicates with locks, cameras, and sensors", "MQTT")
+Rel(SecurityRepository, Database, "Stores security records")
+@enduml
