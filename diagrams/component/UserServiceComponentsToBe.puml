@@ -1,0 +1,31 @@
+@startuml
+title User Service - Component Diagram
+
+!include <C4/C4_Component>
+
+Container_Boundary(UserService, "User Service") {
+    Component(UserController, "User Controller", "Handles API requests")
+    Component(UserServiceLogic, "User Service Logic", "Business logic for user management")
+    Component(UserRepository, "User Repository", "Manages user data in DB")
+    Component(AuthService, "Auth Service", "Handles authentication & authorization")
+    Component(SubscriptionService, "Subscription Service", "Manages user subscriptions")
+}
+
+System_Ext(Database, "User Database", "Stores user information", "PostgreSQL")
+System_Ext(MessageBroker, "Message Broker", "Event-driven communication", "Kafka")
+System_Ext(AutomationService, "Automation Service", "Manages automation scenarios")
+
+
+UserController --> UserServiceLogic : "Processes requests"
+UserServiceLogic --> UserRepository : "Fetches/stores user data"
+UserServiceLogic --> AuthService : "Handles authentication"
+UserServiceLogic --> SubscriptionService : "Manages subscriptions"
+
+UserRepository --> Database : "Reads/Writes"
+AuthService --> Database : "Validates credentials"
+SubscriptionService --> Database : "Stores subscription data"
+
+
+UserServiceLogic --> MessageBroker : "Publishes user events"
+UserServiceLogic --> AutomationService : "Provides user data for scenarios"
+@enduml

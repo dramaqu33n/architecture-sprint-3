@@ -1,0 +1,50 @@
+@startuml
+title Smart Home System - Container Diagram
+
+!include <C4/C4_Container>
+
+Person(User, "User", "Interacts with the smart home system")
+
+System_Boundary(SmartHomeSystem, "Smart Home System") {
+    Container(API_Gateway, "API Gateway", "Spring Cloud Gateway", "Routes requests to services")
+
+    Container(UserService, "User Service", "Spring Boot", "Manages users, authentication, and subscriptions")
+    Container(HeatingService, "Heating Service", "Spring Boot", "Manages heating system and temperature control")
+    Container(LightingService, "Lighting Service", "Spring Boot", "Manages lights and switches")
+    Container(SecurityService, "Security Service", "Spring Boot", "Manages locks, cameras, and alarms")
+    Container(AutomationService, "Automation Service", "Spring Boot", "Handles automation scenarios")
+    Container(MonitoringService, "Monitoring Service", "Spring Boot", "Collects and analyzes telemetry data")
+    
+    Container(Database, "PostgreSQL", "Stores system-wide data")
+    Container(MessageBroker, "Kafka", "Handles event-driven communication")
+}
+
+System_Ext(IoTDevices, "IoT Devices", "Smart thermostats, lights, locks, sensors, and cameras")
+
+Rel(User, API_Gateway, "Sends requests")
+Rel(API_Gateway, UserService, "Routes users & authentication requests")
+Rel(API_Gateway, HeatingService, "Routes heating requests")
+Rel(API_Gateway, LightingService, "Routes lighting requests")
+Rel(API_Gateway, SecurityService, "Routes security requests")
+Rel(API_Gateway, AutomationService, "Routes automation requests")
+Rel(API_Gateway, MonitoringService, "Routes monitoring requests")
+
+Rel(HeatingService, IoTDevices, "Controls heating")
+Rel(LightingService, IoTDevices, "Controls lights")
+Rel(SecurityService, IoTDevices, "Controls security devices")
+Rel(AutomationService, IoTDevices, "Manages automation")
+Rel(MonitoringService, IoTDevices, "Collects telemetry")
+
+Rel(UserService, Database, "Stores user data")
+Rel(HeatingService, Database, "Stores heating data")
+Rel(LightingService, Database, "Stores lighting data")
+Rel(SecurityService, Database, "Stores security data")
+Rel(AutomationService, Database, "Stores automation rules")
+Rel(MonitoringService, Database, "Stores telemetry data")
+
+Rel(HeatingService, MessageBroker, "Publishes events")
+Rel(LightingService, MessageBroker, "Publishes events")
+Rel(SecurityService, MessageBroker, "Publishes events")
+Rel(AutomationService, MessageBroker, "Publishes automation events")
+Rel(MonitoringService, MessageBroker, "Publishes telemetry events")
+@enduml

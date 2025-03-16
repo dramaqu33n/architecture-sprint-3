@@ -1,0 +1,30 @@
+@startuml
+title Monitoring Service - Component Diagram
+
+!include <C4/C4_Component>
+
+Container_Boundary(MonitoringService, "Monitoring Service") {
+
+    Component(MonitoringController, "Monitoring Controller", "Spring Boot", "Handles API requests for telemetry data")
+    Component(TelemetryProcessor, "Telemetry Processor", "Spring Boot", "Processes and analyzes sensor data")
+    Component(AnomalyDetector, "Anomaly Detector", "Spring Boot", "Detects unusual patterns in telemetry data")
+    Component(MonitoringRepository, "Monitoring Repository", "PostgreSQL", "Stores telemetry data")
+    Component(AlertManager, "Alert Manager", "Spring Boot", "Generates alerts based on anomalies")
+    Component(EventPublisher, "Event Publisher", "Kafka", "Publishes monitoring events")
+}
+
+System_Ext(ApiGateway, "API Gateway", "Routes API requests")
+System_Ext(MessageBroker, "Kafka", "Handles event-driven communication")
+System_Ext(Database, "PostgreSQL", "Stores telemetry data")
+System_Ext(IoTDevices, "IoT Sensors", "Collects physical parameters")
+
+Rel(ApiGateway, MonitoringController, "Routes monitoring requests")
+Rel(MonitoringController, TelemetryProcessor, "Processes sensor data")
+Rel(TelemetryProcessor, AnomalyDetector, "Detects anomalies")
+Rel(TelemetryProcessor, MonitoringRepository, "Stores telemetry data")
+Rel(AnomalyDetector, AlertManager, "Generates alerts for anomalies")
+Rel(AlertManager, EventPublisher, "Publishes alerts")
+Rel(EventPublisher, MessageBroker, "Sends monitoring events")
+Rel(MonitoringRepository, Database, "Stores telemetry data")
+Rel(TelemetryProcessor, IoTDevices, "Receives sensor data")
+@enduml

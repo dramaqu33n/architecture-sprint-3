@@ -1,0 +1,27 @@
+@startuml
+title Lighting Service - Component Diagram
+
+!include <C4/C4_Component>
+
+Container_Boundary(LightingService, "Lighting Service") {
+
+    Component(LightingController, "Lighting Controller", "Spring Boot", "Handles lighting-related API requests")
+    Component(LightingManager, "Lighting Manager", "Spring Boot", "Controls lighting devices and automation")
+    Component(LightingRepository, "Lighting Repository", "PostgreSQL", "Stores lighting states and schedules")
+    Component(EventPublisher, "Event Publisher", "Kafka", "Publishes lighting-related events")
+
+}
+
+System_Ext(ApiGateway, "API Gateway", "Routes API requests")
+System_Ext(MessageBroker, "Kafka", "Handles event-driven communication")
+System_Ext(Database, "PostgreSQL", "Stores lighting data")
+System_Ext(IoTDevices, "Smart Lighting Devices", "Smart bulbs, switches, and relays communicating via MQTT")
+
+Rel(ApiGateway, LightingController, "Routes lighting requests")
+Rel(LightingController, LightingManager, "Handles business logic")
+Rel(LightingManager, LightingRepository, "Stores lighting states")
+Rel(LightingManager, EventPublisher, "Publishes lighting events")
+Rel(EventPublisher, MessageBroker, "Sends lighting events")
+Rel(LightingManager, IoTDevices, "Communicates with smart lights & switches", "MQTT")
+Rel(LightingRepository, Database, "Stores lighting records")
+@enduml

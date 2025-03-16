@@ -1,0 +1,15 @@
+@startuml
+title WarmHouse Context Diagram
+
+top to bottom direction
+
+!include <C4/C4_Container>
+
+Person(user, "User", "A user of the WarmHouse heating system")
+System(WarmhouseSystem, "Warmhouse System", "System managing house temperature")
+
+System_Ext(TemperatureSensor, "TemperatureSensor", "Hardware component")
+
+Rel(user, WarmhouseSystem, "Uses the system")
+Rel(WarmhouseSystem,TemperatureSensor,"Fetches current temperature")
+@enduml

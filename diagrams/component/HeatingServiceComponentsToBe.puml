@@ -1,0 +1,27 @@
+@startuml
+title Heating Service - Component Diagram
+
+!include <C4/C4_Component>
+
+Container_Boundary(HeatingService, "Heating Service") {
+
+    Component(HeatingController, "Heating Controller", "Spring Boot", "Handles heating-related API requests")
+    Component(TemperatureManager, "Temperature Manager", "Spring Boot", "Processes temperature data and controls heating")
+    Component(HeatingRepository, "Heating Repository", "PostgreSQL", "Stores heating system states and logs")
+    Component(EventPublisher, "Event Publisher", "Kafka", "Publishes heating-related events")
+
+}
+
+System_Ext(ApiGateway, "API Gateway", "Routes API requests")
+System_Ext(MessageBroker, "Kafka", "Handles event-driven communication")
+System_Ext(Database, "PostgreSQL", "Stores heating data")
+System_Ext(IoTDevices, "Smart Heating Devices", "Sensors & relays communicating via MQTT")
+
+Rel(ApiGateway, HeatingController, "Routes heating requests")
+Rel(HeatingController, TemperatureManager, "Handles business logic")
+Rel(TemperatureManager, HeatingRepository, "Stores heating system states")
+Rel(TemperatureManager, EventPublisher, "Publishes heating events")
+Rel(EventPublisher, MessageBroker, "Sends heating events")
+Rel(TemperatureManager, IoTDevices, "Communicates with sensors & relays", "MQTT")
+Rel(HeatingRepository, Database, "Stores heating records")
+@enduml

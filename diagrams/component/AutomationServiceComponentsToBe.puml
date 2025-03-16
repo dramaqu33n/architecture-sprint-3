@@ -1,0 +1,28 @@
+@startuml
+title Automation Service - Component Diagram
+
+!include <C4/C4_Component>
+
+Container_Boundary(AutomationService, "Automation Service") {
+    
+    Component(AutomationController, "Automation Controller", "Spring Boot", "Handles API requests for automation scenarios")
+    Component(ScenarioManager, "Scenario Manager", "Spring Boot", "Manages user-defined automation scenarios")
+    Component(RuleEngine, "Rule Engine", "Spring Boot", "Executes automation rules based on triggers and conditions")
+    Component(AutomationRepository, "Automation Repository", "PostgreSQL", "Stores automation rules and history")
+    Component(EventPublisher, "Event Publisher", "Kafka", "Publishes automation events")
+}
+
+System_Ext(ApiGateway, "API Gateway", "Routes API requests")
+System_Ext(MessageBroker, "Kafka", "Handles event-driven communication")
+System_Ext(Database, "PostgreSQL", "Stores automation rules and logs")
+System_Ext(IoTDevices, "IoT Devices", "Smart home devices")
+
+Rel(ApiGateway, AutomationController, "Routes automation requests")
+Rel(AutomationController, ScenarioManager, "Manages automation scenarios")
+Rel(ScenarioManager, RuleEngine, "Executes automation rules")
+Rel(RuleEngine, IoTDevices, "Sends control commands")
+Rel(ScenarioManager, AutomationRepository, "Stores automation rules")
+Rel(RuleEngine, EventPublisher, "Publishes automation execution events")
+Rel(EventPublisher, MessageBroker, "Sends automation events")
+Rel(AutomationRepository, Database, "Stores automation rules and logs")
+@enduml
