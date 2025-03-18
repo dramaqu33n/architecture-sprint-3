@@ -47,6 +47,24 @@ entity AutomationScenario {
   * user_id : Long [FK] -- User(id)
 }
 
+entity TelemetryHistory {
+  * id : Long [PK]
+  --
+  * device_id : Long [FK] -- IoTDevice(id)
+  * parameter : String
+  * value : Double
+  * timestamp : Timestamp
+}
+
+entity AutomationRules {
+  * id : Long [PK]
+  --
+  * scenario_id : Long [FK] -- AutomationScenario(id)
+  * rule_type : String
+  * condition : JSON
+  * action : JSON
+}
+
 entity Trigger {
   * id : Long [PK]
   --
@@ -86,5 +104,8 @@ User ||--o{ IoTDevice : "interacts"
 HeatingSystem ||--o{ TemperatureSensor : "has"
 AutomationScenario ||--o{ Trigger : "has"
 AutomationScenario ||--o{ Action : "executes"
+AutomationScenario ||--o{ AutomationRules : "defines"
+AutomationRules ||--o{ IoTDevice : "controls"
 IoTDevice ||--o{ MonitoringData : "generates"
+IoTDevice ||--o{ TelemetryHistory : "logs"
 @enduml

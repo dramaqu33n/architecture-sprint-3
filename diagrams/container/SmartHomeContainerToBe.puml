@@ -6,22 +6,25 @@ title Smart Home System - Container Diagram
 Person(User, "User", "Interacts with the smart home system")
 
 System_Boundary(SmartHomeSystem, "Smart Home System") {
-    Container(API_Gateway, "API Gateway", "Spring Cloud Gateway", "Routes requests to services")
-
+    Container(API_Gateway, "API Gateway", "Spring Cloud Gateway", "Routes requests to services, handles authentication (JWT/OAuth2)")
     Container(UserService, "User Service", "Spring Boot", "Manages users, authentication, and subscriptions")
     Container(HeatingService, "Heating Service", "Spring Boot", "Manages heating system and temperature control")
     Container(LightingService, "Lighting Service", "Spring Boot", "Manages lights and switches")
     Container(SecurityService, "Security Service", "Spring Boot", "Manages locks, cameras, and alarms")
     Container(AutomationService, "Automation Service", "Spring Boot", "Handles automation scenarios")
     Container(MonitoringService, "Monitoring Service", "Spring Boot", "Collects and analyzes telemetry data")
-    
-    Container(Database, "PostgreSQL", "Stores system-wide data")
+
+    ContainerDb(MainDatabase, "PostgreSQL (Master)", "Stores system-wide data (write operations)")
+    ContainerDb(ReplicaDB1, "PostgreSQL (Read Replica 1)", "Handles read-heavy queries")
+    ContainerDb(ReplicaDB2, "PostgreSQL (Read Replica 2)", "Handles additional read queries")
     Container(MessageBroker, "Kafka", "Handles event-driven communication")
+    Container(DeadLetterQueue, "Kafka DLQ", "Stores failed messages")
+    Container(RetryQueue, "Kafka Retry Queue", "Handles message retries")
 }
 
 System_Ext(IoTDevices, "IoT Devices", "Smart thermostats, lights, locks, sensors, and cameras")
 
-Rel(User, API_Gateway, "Sends requests")
+Rel(User, API_Gateway, "Sends authenticated requests (JWT/OAuth2)")
 Rel(API_Gateway, UserService, "Routes users & authentication requests")
 Rel(API_Gateway, HeatingService, "Routes heating requests")
 Rel(API_Gateway, LightingService, "Routes lighting requests")
@@ -29,22 +32,29 @@ Rel(API_Gateway, SecurityService, "Routes security requests")
 Rel(API_Gateway, AutomationService, "Routes automation requests")
 Rel(API_Gateway, MonitoringService, "Routes monitoring requests")
 
+Rel(UserService, MainDatabase, "Stores user credentials (hashed)")
+Rel(MainDatabase, ReplicaDB1, "Replicates data (read-only)")
+Rel(MainDatabase, ReplicaDB2, "Replicates data (read-only)")
+
 Rel(HeatingService, IoTDevices, "Controls heating")
 Rel(LightingService, IoTDevices, "Controls lights")
 Rel(SecurityService, IoTDevices, "Controls security devices")
 Rel(AutomationService, IoTDevices, "Manages automation")
 Rel(MonitoringService, IoTDevices, "Collects telemetry")
 
-Rel(UserService, Database, "Stores user data")
-Rel(HeatingService, Database, "Stores heating data")
-Rel(LightingService, Database, "Stores lighting data")
-Rel(SecurityService, Database, "Stores security data")
-Rel(AutomationService, Database, "Stores automation rules")
-Rel(MonitoringService, Database, "Stores telemetry data")
-
 Rel(HeatingService, MessageBroker, "Publishes events")
 Rel(LightingService, MessageBroker, "Publishes events")
 Rel(SecurityService, MessageBroker, "Publishes events")
 Rel(AutomationService, MessageBroker, "Publishes automation events")
 Rel(MonitoringService, MessageBroker, "Publishes telemetry events")
+
+Rel(MessageBroker, RetryQueue, "Moves failed messages for retry")
+Rel(RetryQueue, MessageBroker, "Retries failed messages")
+Rel(MessageBroker, DeadLetterQueue, "Moves unprocessed messages to DLQ")
+
+Rel(HeatingService, ReplicaDB1, "Reads configuration & telemetry")
+Rel(LightingService, ReplicaDB1, "Reads configuration & telemetry")
+Rel(SecurityService, ReplicaDB2, "Reads security logs")
+Rel(MonitoringService, ReplicaDB2, "Reads sensor data")
 @enduml
+
