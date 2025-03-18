@@ -1,0 +1,119 @@
+@startuml
+title Smart Home System - Main Classes
+
+class User {
+  - Long id
+  - String name
+  - String email
+  - List<AutomationScenario> scenarios
+  + configureScenario(scenario: AutomationScenario): void
+}
+
+class UserService {
+  + registerUser(name: String, email: String): User
+  + authenticateUser(email: String, password: String): boolean
+  + assignScenario(user: User, scenario: AutomationScenario): void
+}
+
+class HeatingSystem {
+  - Long id
+  - boolean isOn
+  - double targetTemperature
+  - double currentTemperature
+  + turnOn(): void
+  + turnOff(): void
+  + setTargetTemperature(temp: double): void
+}
+
+class TemperatureSensor {
+  - Long id
+  - double currentTemperature
+  - LocalDateTime lastUpdated
+  + getTemperature(): double
+}
+
+class HeatingService {
+  + turnOnHeating(id: Long): void
+  + turnOffHeating(id: Long): void
+  + setTargetTemperature(id: Long, temp: double): void
+}
+
+class Light {
+  - Long id
+  - boolean isOn
+  + turnOn(): void
+  + turnOff(): void
+}
+
+class LightingService {
+  + turnOnLight(id: Long): void
+  + turnOffLight(id: Long): void
+}
+
+class SecurityDevice {
+  - Long id
+  - boolean isArmed
+  + arm(): void
+  + disarm(): void
+}
+
+class SecurityService {
+  + armSystem(id: Long): void
+  + disarmSystem(id: Long): void
+}
+
+class AutomationScenario {
+  - Long id
+  - String name
+  - List<Trigger> triggers
+  - List<Action> actions
+  + execute(): void
+}
+
+class Trigger {
+  - Long id
+  - String condition
+  + check(): boolean
+}
+
+class Action {
+  - Long id
+  - String type
+  + execute(): void
+}
+
+class AutomationService {
+  + executeScenario(scenarioId: Long): void
+}
+
+class MonitoringService {
+  + collectTelemetry(deviceId: Long): void
+  + analyzeData(): void
+  + sendAlert(userId: Long, message: String): void
+}
+
+class IoTDevice {
+  - Long id
+  - String type
+  - String status
+  + sendCommand(command: String): void
+}
+
+UserService -- User : manages >
+User "1" -- "N" AutomationScenario : configures >
+AutomationScenario "1" -- "N" Trigger : has >
+AutomationScenario "1" -- "N" Action : has >
+
+Trigger ..|> TemperatureSensor : "based on"
+Action ..|> HeatingService : "can control"
+Action ..|> LightingService : "can control"
+Action ..|> SecurityService : "can control"
+
+HeatingService -- HeatingSystem : manages >
+HeatingSystem -- TemperatureSensor : monitors >
+LightingService -- Light : controls >
+SecurityService -- SecurityDevice : secures >
+AutomationService -- AutomationScenario : executes >
+MonitoringService -- IoTDevice : collects data >
+IoTDevice -- User : interacts >
+@enduml

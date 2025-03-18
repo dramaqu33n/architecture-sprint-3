@@ -1,0 +1,111 @@
+@startuml
+title Smart Home System - ER Diagram
+
+entity User {
+  * id : Long [PK]
+  --
+  * name : String
+  * email : String [Unique]
+  * password_hash : String
+}
+
+entity HeatingSystem {
+  * id : Long [PK]
+  --
+  * is_on : Boolean
+  * target_temperature : Double
+  * current_temperature : Double
+  * user_id : Long [FK] -- User(id)
+}
+
+entity TemperatureSensor {
+  * id : Long [PK]
+  --
+  * heating_system_id : Long [FK] -- HeatingSystem(id)
+  * current_temperature : Double
+  * last_updated : Timestamp
+}
+
+entity Light {
+  * id : Long [PK]
+  --
+  * is_on : Boolean
+  * user_id : Long [FK] -- User(id)
+}
+
+entity SecurityDevice {
+  * id : Long [PK]
+  --
+  * is_armed : Boolean
+  * user_id : Long [FK] -- User(id)
+}
+
+entity AutomationScenario {
+  * id : Long [PK]
+  --
+  * name : String
+  * user_id : Long [FK] -- User(id)
+}
+
+entity TelemetryHistory {
+  * id : Long [PK]
+  --
+  * device_id : Long [FK] -- IoTDevice(id)
+  * parameter : String
+  * value : Double
+  * timestamp : Timestamp
+}
+
+entity AutomationRules {
+  * id : Long [PK]
+  --
+  * scenario_id : Long [FK] -- AutomationScenario(id)
+  * rule_type : String
+  * condition : JSON
+  * action : JSON
+}
+
+entity Trigger {
+  * id : Long [PK]
+  --
+  * scenario_id : Long [FK] -- AutomationScenario(id)
+  * condition : String
+}
+
+entity Action {
+  * id : Long [PK]
+  --
+  * scenario_id : Long [FK] -- AutomationScenario(id)
+  * type : String
+}
+
+entity MonitoringData {
+  * id : Long [PK]
+  --
+  * device_id : Long [FK] -- IoTDevice(id)
+  * timestamp : Timestamp
+  * data : String
+}
+
+entity IoTDevice {
+  * id : Long [PK]
+  --
+  * type : String
+  * status : String
+  * user_id : Long [FK] -- User(id)
+}
+
+User ||--o{ HeatingSystem : "owns"
+User ||--o{ Light : "controls"
+User ||--o{ SecurityDevice : "manages"
+User ||--o{ AutomationScenario : "configures"
+User ||--o{ IoTDevice : "interacts"
+
+HeatingSystem ||--o{ TemperatureSensor : "has"
+AutomationScenario ||--o{ Trigger : "has"
+AutomationScenario ||--o{ Action : "executes"
+AutomationScenario ||--o{ AutomationRules : "defines"
+AutomationRules ||--o{ IoTDevice : "controls"
+IoTDevice ||--o{ MonitoringData : "generates"
+IoTDevice ||--o{ TelemetryHistory : "logs"
+@enduml
